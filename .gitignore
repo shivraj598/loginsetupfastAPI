@@ -7,8 +7,12 @@ venv/
 *.sqlite3
 .DS_Store
 cookies.txt
+.playwright-mcp/
+
 
 
 #md file
 ./projectDescription.md
 
+landing.png
+account.png
