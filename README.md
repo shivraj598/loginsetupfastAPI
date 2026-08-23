@@ -1,6 +1,6 @@
 # Customer Login & Sign-Up API
 
-Production-grade customer authentication API for an online store, built with **FastAPI + SQLAlchemy (async)**.
+Production-grade customer authentication stack: **FastAPI + SQLAlchemy (async)** backend with a **Next.js + shadcn/ui** storefront frontend.
 
 - Passwords hashed with **bcrypt** (Passlib)
 - **HttpOnly / SameSite=Lax / Secure** cookie sessions via JWT
@@ -10,31 +10,42 @@ Production-grade customer authentication API for an online store, built with **F
 ## Project structure
 
 ```
-app/
+app/              # FastAPI backend
 ├── config.py     # Settings loaded from .env (pydantic-settings)
 ├── database.py   # Async engine, sessionmaker, Base, get_db dependency
 ├── security.py   # bcrypt hashing/verification, JWT create/decode
 ├── models.py     # SQLAlchemy User table + Pydantic request/response schemas
 └── main.py       # FastAPI app, CORS, routes, get_current_user dependency
+
+web/              # Next.js frontend (App Router, Tailwind v4, shadcn/ui)
+├── src/app/(auth)/     # Sign-in and sign-up pages
+├── src/app/account/    # Protected profile page (server-side session check)
+├── src/components/     # Auth forms, brand mark, reveal animation
+└── src/lib/api.ts      # Typed API client with cookie credentials
 ```
 
 ## Setup
+
+### Backend
 
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # then edit values
-```
-
-Run:
-
-```bash
-uvicorn app.main:app --reload
-# Swagger docs: http://localhost:8000/docs
+uvicorn app.main:app --reload    # http://localhost:8000/docs
 ```
 
 > Set `COOKIE_SECURE=true` in production so the cookie is only sent over HTTPS.
+
+### Frontend
+
+```bash
+cd web
+npm install
+cp .env.example .env.local   # NEXT_PUBLIC_API_URL=http://localhost:8000
+npm run dev                  # http://localhost:3000
+```
 
 ## Switching to PostgreSQL later
 
@@ -61,3 +72,5 @@ curl -c cookies.txt -X POST localhost:8000/signin -H 'Content-Type: application/
 
 curl -b cookies.txt localhost:8000/customers/me
 ```
+
+Or use the full UI flow at http://localhost:3000: create an account, get signed in automatically, and land on the protected `/account` page.
